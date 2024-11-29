@@ -9,8 +9,9 @@ export class Viajante{
     public dataInclusao: Date;
     public id?: number;
     public cidadeReferencia?: string;
+    public dataNascimento?: Date;
 
-    constructor (nome: string, email: string, senha: string, isAtivo: boolean, device: string, dataInclusao: Date, telefone: string , id?: number, cidadeReferencia?: string){
+    constructor (nome: string, email: string, senha: string, isAtivo: boolean, device: string, dataInclusao: Date, telefone: string , id?: number, cidadeReferencia?: string, dataNascimento?: Date){
         this.nome = nome;
         this.email = email;
         this.senha = senha;
@@ -20,6 +21,7 @@ export class Viajante{
         this.id = id;
         this.cidadeReferencia = cidadeReferencia;
         this.telefone = telefone;
+        this.dataNascimento = dataNascimento;
     }
 }
 
