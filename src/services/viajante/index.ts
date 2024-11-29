@@ -65,7 +65,7 @@ export class ViajanteService {
     public static async GetViajanteByTelefoneAndSenha(telefone: string, senhaCriptografada: string){
         const db = await pool.getConnection();
         try {
-            const sql = `SELECT senha FROM viajantes WHERE telefone = ?`;
+            const sql = `SELECT * FROM viajantes WHERE telefone = ?`;
             const [viajanteResult] = await db.query<RowDataPacket[]>(sql,[telefone]);
             const viajante = viajanteResult[0];
             const isSenhasIguais = await bcrypt.compare(senhaCriptografada, viajanteResult[0].senha)
