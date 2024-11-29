@@ -69,8 +69,11 @@ export class ViajanteService {
             const [viajanteResult] = await db.query<RowDataPacket[]>(sql,[telefone]);
             const viajante = viajanteResult[0];
             const isSenhasIguais = await bcrypt.compare(senhaCriptografada, viajanteResult[0].senha)
-            
-            return isSenhasIguais;
+            if(isSenhasIguais){
+                return viajante;
+            }else{
+                return { message: 'Ops... Verifique a senha informada!'}
+            }
 
         } catch (error) {
             console.error(error)
