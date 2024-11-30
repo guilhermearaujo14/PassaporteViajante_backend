@@ -15,22 +15,22 @@ export class ViajanteService {
         try {
 
             const novoViajante: Viajante = new Viajante(nome, email, senha, isAtivo, device, new Date(),telefone, 0, cidadeReferencia, dataNascimento);
-            const isPodeCadastrar = await this.GetByEmail(email);
+            const isExisteUsuario = await this.GetByEmail(email);
 
             const senhaCriptografada = bcrypt.hashSync(senha, 10)
-
-            if (isPodeCadastrar) {
+            console.log(isExisteUsuario)
+            if (!isExisteUsuario) {
                 const response = await db.query(`INSERT INTO viajantes (nome, email, telefone, senha, isAtivo, device, cidadeReferencia, dataNascimento) values (?,?,?,?,?,?,?,?)`,
-                    [novoViajante.nome, novoViajante.email, novoViajante.telefone, novoViajante.senha, novoViajante.isAtivo, novoViajante.device, novoViajante.cidadeReferencia, novoViajante.dataNascimento]);
+                    [novoViajante.nome, novoViajante.email, novoViajante.telefone, senhaCriptografada, novoViajante.isAtivo, novoViajante.device, novoViajante.cidadeReferencia, novoViajante.dataNascimento]);
                 return { message: 'Cadastro realizado com sucesso!' }
             }else{
                 const updateResponse = await db.query(`UPDATE viajantes SET nome = ?, email = ?, senha = ?, isAtivo = ?, device = ?, cidadeReferencia = ?, dataNascimento = ? WHERE email = ?`, 
-                    [novoViajante.nome, novoViajante.email, novoViajante.senha, novoViajante.isAtivo, novoViajante.device, novoViajante.cidadeReferencia, novoViajante.dataNascimento, novoViajante.email]);
+                    [novoViajante.nome, novoViajante.email, senhaCriptografada, novoViajante.isAtivo, novoViajante.device, novoViajante.cidadeReferencia, novoViajante.dataNascimento, novoViajante.email]);
                 
                     return { messate: 'Viajante atualizado com sucesso!'}
             }
             return { message: 'Ops... Não foi possível cadastrar, pois já existe um usuário usando esse email!'}
-            
+
         } catch (error) {
             return { message: 'Erro -> ', error }
         }
@@ -45,7 +45,9 @@ export class ViajanteService {
             const [result] = await db.query(`SELECT * FROM viajantes WHERE email = ?`, [email]);
             const isExisteUsuario = result ? true : false;
             console.log(result)
+
             return isExisteUsuario
+
         } catch (error) {
             return { message: 'Erro -> ', error }
         }
