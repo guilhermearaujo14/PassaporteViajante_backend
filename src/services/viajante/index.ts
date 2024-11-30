@@ -10,21 +10,27 @@ import { RowDataPacket } from "mysql2";
 export class ViajanteService {
 
     
-    public static async Create(nome: string, email: string, senha: string, isAtivo: boolean, device: string, cidadeReferencia: string, telefone: string) {
+    public static async Create(nome: string, email: string, senha: string, isAtivo: boolean, device: string, cidadeReferencia: string, telefone: string, dataNascimento: Date)  {
         const db = await pool.getConnection();
         try {
 
-            const novoViajante: Viajante = new Viajante(nome, email, senha, isAtivo, device, new Date(),telefone, 0, cidadeReferencia);
+            const novoViajante: Viajante = new Viajante(nome, email, senha, isAtivo, device, new Date(),telefone, 0, cidadeReferencia, dataNascimento);
             const isPodeCadastrar = await this.GetByEmail(email);
 
             const senhaCriptografada = bcrypt.hashSync(senha, 10)
 
             if (isPodeCadastrar) {
-                const response = await db.query(`INSERT INTO viajantes (nome, email, telefone, senha, isAtivo, device, cidadeReferencia) 
-                values ('${novoViajante.nome}', '${novoViajante.email}', '${novoViajante.telefone}','${senhaCriptografada}', ${novoViajante.isAtivo}, ${novoViajante.device}, '${novoViajante.cidadeReferencia}')`)
+                const response = await db.query(`INSERT INTO viajantes (nome, email, telefone, senha, isAtivo, device, cidadeReferencia, dataNascimento) values (?,?,?,?,?,?,?,?)`,
+                    [novoViajante.nome, novoViajante.email, novoViajante.telefone, novoViajante.senha, novoViajante.isAtivo, novoViajante.device, novoViajante.cidadeReferencia, novoViajante.dataNascimento]);
                 return { message: 'Cadastro realizado com sucesso!' }
+            }else{
+                const updateResponse = await db.query(`UPDATE viajantes SET nome = ?, email = ?, senha = ?, isAtivo = ?, device = ?, cidadeReferencia = ?, dataNascimento = ? WHERE email = ?`, 
+                    [novoViajante.nome, novoViajante.email, novoViajante.senha, novoViajante.isAtivo, novoViajante.device, novoViajante.cidadeReferencia, novoViajante.dataNascimento, novoViajante.email]);
+                
+                    return { messate: 'Viajante atualizado com sucesso!'}
             }
             return { message: 'Ops... Não foi possível cadastrar, pois já existe um usuário usando esse email!'}
+            
         } catch (error) {
             return { message: 'Erro -> ', error }
         }
